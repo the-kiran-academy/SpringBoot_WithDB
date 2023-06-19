@@ -1,90 +1,83 @@
 package com.jbk.serviceIMPL;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.jbk.dao.ProductDao;
 import com.jbk.entity.Product;
 import com.jbk.service.ProductService;
 
-
 @Service
 public class ProductServiceIMPL implements ProductService {
-	
-	
+
 	@Autowired
 	private ProductDao dao;
 
 	@Override
-	public boolean saveProduct(Product product) {
-		
-		String productId = new SimpleDateFormat("yyyyMMddHHmmss").format(new java.util.Date());
-		product.setProductId(productId);
+	public Boolean addProduct(Product product) {
 
-		
-		boolean isAdded = dao.saveProduct(product);
-
-		return isAdded;
+		String id = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new java.util.Date());
+		product.setProductId(Long.parseLong(id));
+		return dao.addProduct(product);
 	}
 
 	@Override
-	public Product getProductById(String productId) {
+	public Product getProductById(Long id) {
+		return dao.getProductById(id);
+	}
+
+	@Override
+	public Product getProductByName(String getProductByName) {
+		return dao.getProductByName(getProductByName);
+	}
+
+	@Override
+	public List<Product> getAllProducts() {
+		return dao.getAllProducts();
+	}
+
+	@Override
+	public Boolean deleteProduct(Long id) {
+		return dao.deleteProduct(id);
+	}
+
+	@Override
+	public Boolean updateProduct(Product product) {
+		return dao.updateProduct(product);
+	}
+
+	@Override
+	public List<Product> sortProducts(String sortBy, String fieldName) {
+		return dao.sortProducts(sortBy, fieldName);
+	}
+
+	@Override
+	public List<Product> getMaxPriceProducts() {
+		return dao.getMaxPriceProducts();
+	}
+
+	@Override
+	public Double countSumOfProductPrice() {
 		
-		Product product = dao.getProductById(productId);
-
-		return product;
-	}
-
-	@Override
-	public List<Product> getAllProduct() {
-		return null;
-	}
-
-	@Override
-	public boolean deleteProductById(String productId) {
-		return false;
-	}
-
-	@Override
-	public boolean updateProduct(Product product) {
-		return false;
-	}
-
-	@Override
-	public List<Product> sortProductsById_ASC() {
-		
-		return null;
-	}
-
-	@Override
-	public List<Product> sortProductsByName_DESC() {
-		
-		return null;
-	}
-
-	@Override
-	public Product getMaxPriceProducts() {
-
 		
 		
-		return null;
+		double sumOfProductPrice = dao.countSumOfProductPrice();
+
+		String formattedNumber = String.format("%.3f", sumOfProductPrice);
+		System.out.println(formattedNumber);
+
+		return Double.parseDouble(formattedNumber);
+
 	}
 
 	@Override
-	public double countSumOfProductPrice() {
+	public Long getTotalCountOfProducts() {
 		
-		return 0;
-	}
-
-	@Override
-	public int getTotalCountOfProducts() {
-		
-		return 0;
+		return dao.getTotalCountOfProducts();
 	}
 
 }

@@ -1,7 +1,6 @@
 package com.jbk.controller;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,71 +13,109 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.jbk.entity.Product;
 import com.jbk.service.ProductService;
-import com.jbk.serviceIMPL.ProductServiceIMPL;
 
 @RestController
-@RequestMapping("/product")
+@RequestMapping(value = "/product")
 public class ProductController {
 
 	@Autowired
 	private ProductService service;
 
-	@PostMapping("/save-product")
-	public ResponseEntity<String> saveProduct(@RequestBody Product product) {
+	@PostMapping(value = "/save-product")
+	public ResponseEntity<Boolean> addCategory(@RequestBody Product product) {
 
-		System.out.println(11);
-		
-		boolean isAdded = service.saveProduct(product);
-
+		Boolean isAdded = service.addProduct(product);
 		if (isAdded) {
-
-			return new ResponseEntity<String>("Saved !", HttpStatus.CREATED);
-
+			return new ResponseEntity<>(isAdded, HttpStatus.CREATED);
 		} else {
-
-			return ResponseEntity.ok("Product Not Saved !");
+			return new ResponseEntity<>(isAdded, HttpStatus.NOT_FOUND);
 		}
-
 	}
 
-	@GetMapping("/get-product-by-id/{id}")
-	public Object getProduct(@PathVariable("id") String id) {
-		
+	@GetMapping(value = "/get-product-by-id/{id}")
+	public ResponseEntity<Product> getProductById(@PathVariable Long id) {
 		Product product = service.getProductById(id);
 		if (product != null) {
-			return product;
+			return new ResponseEntity<Product>(product, HttpStatus.FOUND);
 		} else {
-			return "Not Found";
+			return new ResponseEntity<Product>(HttpStatus.NO_CONTENT);
 		}
-
 	}
 
-	@GetMapping("/get-all-product")
-	public List<Product> getProduct() {
-		return service.getAllProduct();
-
+	@GetMapping(value = "/get-all-products")
+	public ResponseEntity<List<Product>> getAllProduct() {
+		List<Product> list = service.getAllProducts();
+		if (!list.isEmpty()) {
+			return new ResponseEntity<List<Product>>(list, HttpStatus.FOUND);
+		} else {
+			return new ResponseEntity<List<Product>>(HttpStatus.NO_CONTENT);
+		}
 	}
 
-	@DeleteMapping("/delete-product")
-	public String deleteProductById(@RequestParam("id") String id) {
-		boolean isDeleted = service.deleteProductById(id);
+	@DeleteMapping(value = "/delete-product")
+	public ResponseEntity<Boolean> deleteProduct(@RequestParam Long id) {
+		Boolean isDeleted = service.deleteProduct(id);
 		if (isDeleted) {
-			return "deleted";
+			return new ResponseEntity<Boolean>(isDeleted, HttpStatus.OK);
 		} else {
-			return "product not found to delete id= " + id;
+			return new ResponseEntity<Boolean>(isDeleted, HttpStatus.NO_CONTENT);
+
+		}
+
+	}
+
+	@PutMapping(value = "update-product")
+	public ResponseEntity<Boolean> updateProduct(@RequestBody Product product) {
+		Boolean isUpdated = service.updateProduct(product);
+		if (isUpdated) {
+			return new ResponseEntity<Boolean>(isUpdated, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<Boolean>(isUpdated, HttpStatus.NO_CONTENT);
+
 		}
 	}
 
-	@PutMapping("/update-product")
-	public String updateProduct(@RequestBody Product product) {
-		boolean isUpdated = service.updateProduct(product);
-		if (isUpdated) {
-			return "updated";
+	@GetMapping(value = "/sort-products")
+	public ResponseEntity<List<Product>> sortProducts(@RequestParam String sortBy, @RequestParam String fieldName) {
+		List<Product> list = service.sortProducts(sortBy, fieldName);
+		if (!list.isEmpty()) {
+			return new ResponseEntity<List<Product>>(list, HttpStatus.FOUND);
 		} else {
-			return "product not found to update id= " + product.getProductId();
+			return new ResponseEntity<List<Product>>(HttpStatus.NO_CONTENT);
+		}
+	}
+
+	@GetMapping(value = "/get-maxprice-products")
+	public ResponseEntity<List<Product>> getMaxPriceProducts() {
+		List<Product> list = service.getMaxPriceProducts();
+		if (!list.isEmpty()) {
+			return new ResponseEntity<List<Product>>(list, HttpStatus.FOUND);
+		} else {
+			return new ResponseEntity<List<Product>>(HttpStatus.NO_CONTENT);
+		}
+	}
+	
+	@GetMapping(value = "/count-sumof-product-price")
+	public ResponseEntity<Object> countSumOfProductPrice(){
+		Double sumOfProductPrice = service.countSumOfProductPrice();
+		
+		if(sumOfProductPrice>0) {
+			return ResponseEntity.ok(sumOfProductPrice);
+		}else {
+			return ResponseEntity.ok("Product Not Exists ");
+		}
+	}
+	
+	@GetMapping(value = "/get-total-products-count")
+	public ResponseEntity<Object> getTotalCountOfProducts(){
+		Long productCount = service.getTotalCountOfProducts();
+		
+		if(productCount>0) {
+			return ResponseEntity.ok(productCount);
+		}else {
+			return ResponseEntity.ok("Product Not Exists ");
 		}
 	}
 

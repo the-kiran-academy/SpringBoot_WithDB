@@ -1,25 +1,29 @@
 package com.jbk.service;
 
 import java.util.List;
-
-import org.springframework.stereotype.Component;
-
 import com.jbk.entity.Product;
-
 
 public interface ProductService {
 
-	public boolean saveProduct(Product product);
-	public Product getProductById(String productId);
-	public List<Product> getAllProduct();
-	public boolean deleteProductById(String productId);
-	public boolean updateProduct(Product product);
-	
-	public List<Product> sortProductsById_ASC();
-	public List<Product> sortProductsByName_DESC();
-	public Product getMaxPriceProducts();
-	public double countSumOfProductPrice();
-	public int getTotalCountOfProducts();
+	public Boolean addProduct(Product product);
+
+	public Product getProductById(Long id);
+
+	public Product getProductByName(String productName);
+
+	public List<Product> getAllProducts();
+
+	public Boolean deleteProduct(Long id);
+
+	public Boolean updateProduct(Product product);
+
+	public List<Product> sortProducts(String sortBy, String fielsName);
+
+	public List<Product> getMaxPriceProducts();
+
+	public Double countSumOfProductPrice();
+
+	public Long getTotalCountOfProducts();
 
 
 }

@@ -2,8 +2,6 @@ package com.jbk.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -12,104 +10,97 @@ import javax.persistence.OneToOne;
 public class Product {
 	
 	@Id
-	@Column(unique = true,nullable = false)
-	private String productId;
+	@Column(nullable = false,unique = true)
+	private Long productId;
 	
-	@Column(unique = true,nullable = false)
+	
+	@Column(nullable = false,unique = true)
 	private String productName;
 	
 	@OneToOne
-	@JoinColumn(name = "supplierId")
+	@JoinColumn(name = "supplier")
 	private Supplier supplierId;
 	
 	@OneToOne
-	@JoinColumn(name = "categoryId")
+	@JoinColumn(name = "category")
 	private Category categoryId;
 	
-	@Column(nullable = false)
-	private int productQty;
 	
 	@Column(nullable = false)
-	private double productPrice;
+	private int productQTY;
 	
+	@Column(nullable = false)
+	private Double productPrice;
 	
 	public Product() {
 		// TODO Auto-generated constructor stub
 	}
 
-
-	public Product(String productId, String productName, Supplier supplierId, Category categoryId, int productQty,
-			double productPrice) {
+	public Product(Long productId, String productName, Supplier supplierId, Category categoryId, int productQTY,
+			Double productPrice) {
 		super();
 		this.productId = productId;
 		this.productName = productName;
 		this.supplierId = supplierId;
 		this.categoryId = categoryId;
-		this.productQty = productQty;
+		this.productQTY = productQTY;
 		this.productPrice = productPrice;
 	}
 
-
-	public String getProductId() {
+	public Long getProductId() {
 		return productId;
 	}
 
+	public void setProductId(Long productId) {
+		this.productId = productId;
+	}
 
 	public String getProductName() {
 		return productName;
 	}
 
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
 
 	public Supplier getSupplierId() {
 		return supplierId;
 	}
 
+	public void setSupplierId(Supplier supplierId) {
+		this.supplierId = supplierId;
+	}
 
 	public Category getCategoryId() {
 		return categoryId;
 	}
 
-
-	public int getProductQty() {
-		return productQty;
-	}
-
-
-	public double getProductPrice() {
-		return productPrice;
-	}
-
-
-	public void setProductId(String productId) {
-		this.productId = productId;
-	}
-
-
-	public void setProductName(String productName) {
-		this.productName = productName;
-	}
-
-
-	public void setSupplierId(Supplier supplierId) {
-		this.supplierId = supplierId;
-	}
-
-
 	public void setCategoryId(Category categoryId) {
 		this.categoryId = categoryId;
 	}
 
-
-	public void setProductQty(int productQty) {
-		this.productQty = productQty;
+	public int getProductQTY() {
+		return productQTY;
 	}
 
+	public void setProductQTY(int productQTY) {
+		this.productQTY = productQTY;
+	}
 
-	public void setProductPrice(double productPrice) {
+	public Double getProductPrice() {
+		return productPrice;
+	}
+
+	public void setProductPrice(Double productPrice) {
 		this.productPrice = productPrice;
 	}
+
+	@Override
+	public String toString() {
+		return "Product [productId=" + productId + ", productName=" + productName + ", supplierId=" + supplierId
+				+ ", categoryId=" + categoryId + ", productQTY=" + productQTY + ", productPrice=" + productPrice + "]";
+	}
 	
 	
-	
-	
+
 }
