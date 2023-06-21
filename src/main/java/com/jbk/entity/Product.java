@@ -5,6 +5,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
 public class Product {
@@ -15,6 +18,7 @@ public class Product {
 	
 	
 	@Column(nullable = false,unique = true)
+	@NotEmpty(message = "Product NAme is Manadatory")
 	private String productName;
 	
 	@OneToOne
@@ -27,9 +31,11 @@ public class Product {
 	
 	
 	@Column(nullable = false)
+	@Min(1)
 	private int productQTY;
 	
 	@Column(nullable = false)
+	@Min(1)
 	private Double productPrice;
 	
 	public Product() {

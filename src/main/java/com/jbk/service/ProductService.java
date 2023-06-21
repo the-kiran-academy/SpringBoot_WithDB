@@ -1,6 +1,9 @@
 package com.jbk.service;
 
 import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import com.jbk.entity.Product;
 
 public interface ProductService {
@@ -24,6 +27,8 @@ public interface ProductService {
 	public Double countSumOfProductPrice();
 
 	public Long getTotalCountOfProducts();
+	
+	public String uploadSheet(MultipartFile file);
 
 
 }
