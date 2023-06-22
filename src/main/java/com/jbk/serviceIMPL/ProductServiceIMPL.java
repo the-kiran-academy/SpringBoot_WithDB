@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -103,20 +104,35 @@ List<Product> list=new ArrayList<Product>();
 
 			Workbook workbook = new XSSFWorkbook(filePath);
 
-			Sheet sheet = workbook.getSheet("product");
+			Sheet sheet = workbook.getSheetAt(0);
 
 			Iterator<Row> rows = sheet.rowIterator();
 
 			while (rows.hasNext()) {
 				Row row = (Row) rows.next();
 				// exclude header row
-				if (row.getRowNum() == 0) {
+				int rowNum = row.getRowNum();
+				if (rowNum == 0) {
 					continue;
 				}
 
 				Product product = new Product();
 				String id = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new java.util.Date());
-				product.setProductId(Long.parseLong(id));
+				
+				//String newId=id.concat(String.valueOf(rowNum));
+				
+				Random random = new Random();
+				String numbers = "123456789";
+				char[] otp = new char[1];
+
+				for (int i = 0; i < 1; i++) {
+
+					otp[i] = numbers.charAt(random.nextInt(numbers.length()));
+				}
+
+				int number = Integer.parseInt(new String(otp));
+				
+				product.setProductId(Long.parseLong(id.concat(String.valueOf(number))));
 
 				Iterator<Cell> cells = row.cellIterator();
 
@@ -185,11 +201,7 @@ List<Product> list=new ArrayList<Product>();
 
 			List<Product> list = readExcel(path + File.separator + name);
 			
-			for (Product product : list) {
-				System.out.println(product);
-			}
-			
-		//msg=	dao.uploadSheet(list);
+		msg=dao.uploadProdcuts(list);
 			
 
 		} catch (Exception e) {

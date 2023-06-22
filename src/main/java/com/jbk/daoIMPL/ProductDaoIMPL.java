@@ -34,6 +34,7 @@ public class ProductDaoIMPL implements ProductDao {
 			isAdded = true;
 
 		} catch (PersistenceException e) {
+			e.printStackTrace();
 			isAdded = false;
 		}
 
@@ -230,6 +231,25 @@ public class ProductDaoIMPL implements ProductDao {
 			productCount = (Long) list.get(0);
 		}
 		return productCount;
+	}
+
+	@Override
+	public String uploadProdcuts(List<Product> list) {
+		int addedCount=0;
+		int alreadyExistsCount=0;
+		for (Product product : list) {
+			Boolean isAdded = addProduct(product);
+			
+			if(isAdded) {
+				addedCount=addedCount+1;
+			}else {
+				alreadyExistsCount=alreadyExistsCount+1;
+			}
+			
+			
+		}
+		return "Added Count ="+addedCount +" & AlreadyExistsCount = "+alreadyExistsCount;
+		
 	}
 
 	
