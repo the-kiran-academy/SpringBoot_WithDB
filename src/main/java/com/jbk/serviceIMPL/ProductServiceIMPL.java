@@ -3,12 +3,16 @@ package com.jbk.serviceIMPL;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -25,13 +29,30 @@ import com.jbk.dao.ProductDao;
 import com.jbk.entity.Category;
 import com.jbk.entity.Product;
 import com.jbk.entity.Supplier;
+import com.jbk.model.Charges;
+import com.jbk.model.FinalProduct;
 import com.jbk.service.ProductService;
+import com.jbk.validation.ValidateProdut;
+
 
 @Service
 public class ProductServiceIMPL implements ProductService {
 
 	@Autowired
 	private ProductDao dao;
+	
+	@Autowired
+	private ValidateProdut validateProdut;
+	
+	
+	Map<String, String> errorMap;
+	Map<Integer, Map<String, String>> validatMap=new HashMap<Integer, Map<String,String>>();
+	int alreadyExistsCounter=0;
+	List<Integer> alreadyExistsRows=new ArrayList<Integer>();
+	
+	Map<String, Object> map=new LinkedHashMap<String, Object>();
+	
+	int lastRowNum=0;
 
 	@Override
 	public Boolean addProduct(Product product) {
@@ -105,6 +126,8 @@ List<Product> list=new ArrayList<Product>();
 			Workbook workbook = new XSSFWorkbook(filePath);
 
 			Sheet sheet = workbook.getSheetAt(0);
+			
+		//lastRowNum = sheet.getLastRowNum()-2;
 
 			Iterator<Row> rows = sheet.rowIterator();
 
@@ -116,6 +139,7 @@ List<Product> list=new ArrayList<Product>();
 					continue;
 				}
 
+				lastRowNum=row.getRowNum();
 				Product product = new Product();
 				String id = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new java.util.Date());
 				
@@ -175,7 +199,24 @@ List<Product> list=new ArrayList<Product>();
 					}
 
 				}
-				list.add(product);
+				
+				 errorMap = validateProdut.validateProduct(product);
+				 if(errorMap.isEmpty()) {
+					 
+					 Product dbProduct = dao.getProductByName(product.getProductName());
+					 if(dbProduct==null) {
+						 list.add(product);
+					 }else {
+						 alreadyExistsCounter=alreadyExistsCounter+1;
+						 alreadyExistsRows.add(row.getRowNum());
+					 }
+					 
+					
+				 }else {
+					 validatMap.put(Integer.valueOf(row.getRowNum()+1), errorMap);
+				 }
+				
+				
 
 			}
 
@@ -188,27 +229,72 @@ List<Product> list=new ArrayList<Product>();
 	}
 
 	@Override
-	public String uploadSheet(MultipartFile file) {
+	public Map<String, Object> uploadSheet(MultipartFile file) {
 		String path = "src/main/resources/";
 		String name = file.getOriginalFilename();
-		String msg=null;
-		try {
-
-			FileOutputStream fos = new FileOutputStream(path + File.separator + name);
-
+		int addedCount=0;
+		try (FileOutputStream fos=new FileOutputStream(path + File.separator + name)){
 			byte[] data = file.getBytes();
 			fos.write(data);
 
 			List<Product> list = readExcel(path + File.separator + name);
 			
-		msg=dao.uploadProdcuts(list);
+		addedCount = dao.uploadProdcuts(list);
 			
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		map.put("Total Record In Sheet", lastRowNum);
+		map.put("Uploaded Record In Db", addedCount);
+		map.put("Total Exists Records In DB", alreadyExistsCounter);
+		map.put("Row Num, Exists Record In DB", alreadyExistsRows);
+		map.put("Excluded Record Count", validatMap.size());
+		map.put("Bad Records Row Num", validatMap);
+		
+		
 
-		return msg;
+		return map;
+	}
+
+	@Override
+	public FinalProduct finalProduct(Long productId) {
+		
+		Product product = dao.getProductById(productId);
+		FinalProduct finalProduct=null;
+		if(product!=null) {
+			finalProduct=new FinalProduct();
+			//calculation gst  productPrice*gst/100
+			double gstAmount=product.getProductPrice()*product.getCategoryId().getGst()/100;
+			
+			//calculate discount productPrice*discount/100
+			double discountAmount=product.getProductPrice()*product.getCategoryId().getDiscount()/100;
+			
+			//calculate finalProductPrice
+			
+			double finalProductPrice=product.getProductPrice()+gstAmount+product.getCategoryId().getDeliveryCharge()-discountAmount;
+			
+			Charges charges=new Charges();
+			charges.setDeliveryCharge(product.getCategoryId().getDeliveryCharge());
+			charges.setGstAmount(gstAmount);
+			
+			finalProduct.setProductId(productId);
+			finalProduct.setProductName(product.getProductName());
+			finalProduct.setCategoryId(product.getCategoryId());
+			finalProduct.setSupplierId(product.getSupplierId());
+			finalProduct.setProductQTY(product.getProductQTY());
+			finalProduct.setProductPrice(product.getProductPrice());
+			finalProduct.setCharges(charges);
+			finalProduct.setDiscountAmount(discountAmount);
+			finalProduct.setFinalProductPrice(finalProductPrice);
+		}
+		 
+		
+		
+		
+		
+		return finalProduct;
 	}
 
 }

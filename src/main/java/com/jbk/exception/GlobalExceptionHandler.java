@@ -34,9 +34,17 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(ProductAlreadyExistsException.class)
 	//@ResponseStatus(code = HttpStatus.NOT_FOUND)
-	public ResponseEntity<String> productAlreadyExistsException(ProductAlreadyExistsException ex){
+	public String productAlreadyExistsException(ProductAlreadyExistsException ex){
 		
-		return new  ResponseEntity(ex.getMessage(),HttpStatus.CONFLICT);
+		return ex.getMessage();
 	}
+	
+	@ExceptionHandler(ProductNotExistsException.class)
+	//@ResponseStatus(code = HttpStatus.NOT_FOUND)
+	public String productNotExistsException(ProductNotExistsException ex){
+		
+		return ex.getMessage();
+	}
+
 
 }

@@ -1,6 +1,7 @@
 package com.jbk.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -20,6 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.jbk.entity.Product;
 import com.jbk.exception.ProductAlreadyExistsException;
+import com.jbk.exception.ProductNotExistsException;
+import com.jbk.model.FinalProduct;
 import com.jbk.service.ProductService;
 
 @RestController
@@ -46,9 +49,24 @@ public class ProductController {
 		if (product != null) {
 			return new ResponseEntity<Product>(product, HttpStatus.FOUND);
 		} else {
-			return new ResponseEntity<Product>(HttpStatus.NO_CONTENT);
+			throw new ProductNotExistsException("Product Not Exists With Id "+id);
 		}
 	}
+	
+	@GetMapping(value = "/get-finalproduct-by-id/{id}")
+	public ResponseEntity<FinalProduct> getFinalProductById(@PathVariable Long id) {
+
+		FinalProduct finalProduct = service.finalProduct(id);
+		
+		if (finalProduct != null) {
+			return new ResponseEntity<FinalProduct>(finalProduct, HttpStatus.FOUND);
+		} else {
+			throw new ProductNotExistsException("Product Not Exists With Id "+id);
+		}
+		
+		
+	}
+	
 
 	@GetMapping(value = "/get-all-products")
 	public ResponseEntity<List<Product>> getAllProduct() {
@@ -127,11 +145,11 @@ public class ProductController {
 	
 	
 	@PostMapping(value = "/uploadSheet")
-	public ResponseEntity<String> uploadSheet(@RequestParam("file") MultipartFile file){
+	public ResponseEntity<Map<String, Object>> uploadSheet(@RequestParam("file") MultipartFile file){
 		
-		String msg = service.uploadSheet(file);
+		Map<String, Object>  map= service.uploadSheet(file);
 		
-		return ResponseEntity.ok(msg);
+		return ResponseEntity.ok(map);
 		
 	}
 

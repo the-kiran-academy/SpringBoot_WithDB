@@ -1,10 +1,12 @@
 package com.jbk.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jbk.entity.Product;
+import com.jbk.model.FinalProduct;
 
 public interface ProductService {
 
@@ -28,7 +30,9 @@ public interface ProductService {
 
 	public Long getTotalCountOfProducts();
 	
-	public String uploadSheet(MultipartFile file);
+	public Map<String, Object> uploadSheet(MultipartFile file);
+	
+	public FinalProduct finalProduct(Long productId);
 
 
 }

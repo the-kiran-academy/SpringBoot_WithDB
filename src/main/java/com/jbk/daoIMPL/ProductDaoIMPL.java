@@ -1,6 +1,5 @@
 package com.jbk.daoIMPL;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.PersistenceException;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import com.jbk.dao.ProductDao;
 import com.jbk.entity.Product;
-import com.jbk.entity.Supplier;
 
 @Repository
 public class ProductDaoIMPL implements ProductDao {
@@ -234,21 +232,18 @@ public class ProductDaoIMPL implements ProductDao {
 	}
 
 	@Override
-	public String uploadProdcuts(List<Product> list) {
+	public int uploadProdcuts(List<Product> list) {
 		int addedCount=0;
-		int alreadyExistsCount=0;
 		for (Product product : list) {
 			Boolean isAdded = addProduct(product);
 			
 			if(isAdded) {
 				addedCount=addedCount+1;
-			}else {
-				alreadyExistsCount=alreadyExistsCount+1;
 			}
 			
 			
 		}
-		return "Added Count ="+addedCount +" & AlreadyExistsCount = "+alreadyExistsCount;
+		return addedCount;
 		
 	}
 

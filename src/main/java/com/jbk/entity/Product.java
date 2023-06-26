@@ -38,6 +38,7 @@ public class Product {
 	@Min(1)
 	private Double productPrice;
 	
+	
 	public Product() {
 		// TODO Auto-generated constructor stub
 	}
